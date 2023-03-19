@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { useDatabase } from '../composition/useDatabase'
-import io from '../services/socketio.services'
+// import io from '../services/socketio.services'
 
 export const useUserStore = defineStore({
   id: 'users',
@@ -47,8 +47,11 @@ export const useUserStore = defineStore({
     },
 
     updateScore(update) {
-      const token = sessionStorage.getItem('access_token')
-      io.socket.emit('update-user', update, token)
+      // const token = sessionStorage.getItem('access_token')
+      // io.socket.emit('update-user', update, token)
+      const db = useDatabase()
+      console.log(update)
+      db.updateScore(update)
     }
   },
   getters: {

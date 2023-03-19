@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { useUserStore } from '../stores/users'
+import { useLeaderboard } from '../stores/leaderboard'
 
 const host = 'localhost:5080'
 
@@ -68,10 +69,19 @@ export const useDatabase = () => {
 
   async function updateScore(update) {
     try {
-      await protect.put(`http://${host}/api/scores`, update)
-      const user = await getMe()
-      const userStore = useUserStore()
-      userStore.setUser(user)
+      const result = await protect.put(`http://${host}/api/scores`, update)
+      const leaderboard = useLeaderboard()
+      leaderboard.updateLeaderboard(result.data.leaders)
+    } catch (error) {
+      return { error: true }
+    }
+  }
+
+  async function getLeaderboard() {
+    try {
+      const result = await protect.put(`http://${host}/api/leaderboard`)
+      const leaderboard = useLeaderboard()
+      leaderboard.updateLeaderboard(result.data.leaders)
     } catch (error) {
       return { error: true }
     }
@@ -82,7 +92,8 @@ export const useDatabase = () => {
     getMe,
     isAuthenticated,
     updateUser,
-    updateScore
+    updateScore,
+    getLeaderboard
   }
 }
 

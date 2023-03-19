@@ -3,7 +3,6 @@ import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useDatabase } from '../composition/useDatabase'
 import { useUserStore } from '../stores/users'
-import io from '../services/socketio.services'
 import TriviaHeader from '../components/layout/TriviaHeader.vue'
 
 const database = useDatabase()
@@ -30,7 +29,7 @@ async function submit() {
   if (!error) {
     const user = await database.getMe()
     userStore.setUser(user)
-    io.socket.emit('get-leaderboard')
+    database.getLeaderboard()
     router.push('/')
   } 
 }
@@ -64,10 +63,6 @@ function cancel() {
             <input v-model="password.value" class="form-input" type="password" @keyup.enter="submit" />
           </div>
         </div>
-
-        <!-- <div v-if="error !== ''">
-          <h1 class="text-red-400">{{ error }}</h1>
-        </div> -->
 
         <div class="space-y-2 space-x-6 text-center">
           <button class="form-btn" type="button" @click="submit">Submit</button>
