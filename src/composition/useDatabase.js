@@ -2,7 +2,12 @@ import axios from 'axios'
 import { useUserStore } from '../stores/users'
 import { useLeaderboard } from '../stores/leaderboard'
 
-const host = 'localhost:5080'
+const dev_host = 'http://localhost:5080'
+const prod_host = 'https://wikifeet-trivia.cyclic.app'
+let host
+
+if (process.env.NODE_ENV === 'prod') host = prod_host
+else host = dev_host
 
 export const useDatabase = () => {
   const protect = axios.create()
@@ -21,7 +26,7 @@ export const useDatabase = () => {
    */
   async function login(user) {
     try {
-      const result = await axios.post(`http://${host}/api/auth/login`, user)
+      const result = await axios.post(`${host}/api/auth/login`, user)
       sessionStorage.setItem('access_token', result.data)
 
       // const userStore = useUserStore()
@@ -40,7 +45,7 @@ export const useDatabase = () => {
    */
   async function getMe() {
     try {
-      const res = await protect.get(`http://${host}/api/auth/me`)
+      const res = await protect.get(`${host}/api/auth/me`)
       return res.data
     } catch (error) {
       return { error: true, message: 'Unauthorized'}
@@ -49,7 +54,7 @@ export const useDatabase = () => {
 
   async function isAuthenticated() {
     try {
-      await protect.get(`http://${host}/api/auth/authenticated`)
+      await protect.get(`${host}/api/auth/authenticated`)
       return true
     } catch (error) {
       return false
@@ -58,7 +63,7 @@ export const useDatabase = () => {
 
   async function updateUser(updated) {
     try {
-      const result = await protect.put(`http://${host}/api/auth/update`, updated)
+      const result = await protect.put(`${host}/api/auth/update`, updated)
       const userStore = useUserStore()
       userStore.setUser(result.data)
       return {}
@@ -69,7 +74,7 @@ export const useDatabase = () => {
 
   async function updateScore(update) {
     try {
-      const result = await protect.put(`http://${host}/api/scores`, update)
+      const result = await protect.put(`${host}/api/scores`, update)
       const leaderboard = useLeaderboard()
       leaderboard.updateLeaderboard(result.data.leaders)
     } catch (error) {
@@ -79,7 +84,7 @@ export const useDatabase = () => {
 
   async function getLeaderboard() {
     try {
-      const result = await protect.put(`http://${host}/api/leaderboard`)
+      const result = await protect.put(`${host}/api/leaderboard`)
       const leaderboard = useLeaderboard()
       leaderboard.updateLeaderboard(result.data.leaders)
     } catch (error) {
